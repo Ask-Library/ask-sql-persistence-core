@@ -1,0 +1,23 @@
+[versions]
+springBoot = "4.0.6"
+ask-exceptions-core-v = "v1.0.0"
+freefair-lombok = "9.5.0"
+
+[libraries]
+spring-boot-dependencies = { group = "org.springframework.boot", name = "spring-boot-dependencies", version.ref = "springBoot" }
+
+ask-exception-core = { group = "com.github.Ask-Library", name = "ask-exception-core", version.ref = "ask-exceptions-core-v" }
+jackson-databind = { group = "com.fasterxml.jackson.core", name ="jackson-databind" }
+
+spring-boot-starter-data-r2dbc = { group = "org.springframework.boot", name = "spring-boot-starter-data-r2dbc" }
+spring-boot-configuration-processor = { group = "org.springframework.boot", name = "spring-boot-configuration-processor", version.ref = "springBoot" }
+spring-boot-autoconfigure-processor = { group = "org.springframework.boot", name = "spring-boot-autoconfigure-processor", version.ref = "springBoot" }
+
+r2dbc-postgresql = { group = "org.postgresql", name = "r2dbc-postgresql" }
+junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher" }
+
+[plugins]
+java-library = { id = "java-library" }
+maven-publish = { id = "maven-publish" }
+jacoco = { id = "jacoco" }
+freefair-lombok = { id = "io.freefair.lombok", version.ref = "freefair-lombok" }
