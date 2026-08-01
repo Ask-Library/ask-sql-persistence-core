@@ -29,6 +29,7 @@ dependencies {
 	api(libs.spring.boot.starter.data.r2dbc)
 
 	implementation(libs.jackson.databind)
+	implementation(libs.ask.core)
 	implementation(libs.ask.exception.core)
 	implementation(libs.r2dbc.postgresql)
 
