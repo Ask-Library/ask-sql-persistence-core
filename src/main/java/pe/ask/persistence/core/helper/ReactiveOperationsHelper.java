@@ -80,7 +80,7 @@ public abstract class ReactiveOperationsHelper <
     @SuppressWarnings("unchecked")
     public void afterPropertiesSet() {
         Class<?>[] typeArguments = GenericTypeResolver.resolveTypeArguments(getClass(), ReactiveOperationsHelper.class);
-        Class<R> repositoryClass = (Class<R>) Objects.requireNonNull(typeArguments)[3];
+        Class<R> repositoryClass = (Class<R>) Objects.requireNonNull(typeArguments)[2];
         this.repository = applicationContext.getBean(repositoryClass);
     }
 
