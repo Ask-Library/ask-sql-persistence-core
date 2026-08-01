@@ -1,11 +1,13 @@
 [versions]
 springBoot = "4.0.6"
-ask-exceptions-core-v = "v1.0.0"
+ask-core-v = "1.0.4"
+ask-exceptions-core-v = "1.0.3"
 freefair-lombok = "9.5.0"
 
 [libraries]
 spring-boot-dependencies = { group = "org.springframework.boot", name = "spring-boot-dependencies", version.ref = "springBoot" }
 
+ask-core = { group = "com.github.Ask-Library", name = "ask-core", version.ref = "ask-core-v" }
 ask-exception-core = { group = "com.github.Ask-Library", name = "ask-exception-core", version.ref = "ask-exceptions-core-v" }
 jackson-databind = { group = "com.fasterxml.jackson.core", name ="jackson-databind" }
 

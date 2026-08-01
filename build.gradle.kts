@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "pe.ask"
-version = "1.0.0"
+version = "1.0.1"
 
 java {
 	toolchain {
@@ -29,6 +29,7 @@ dependencies {
 	api(libs.spring.boot.starter.data.r2dbc)
 
 	implementation(libs.jackson.databind)
+	implementation(libs.ask.core)
 	implementation(libs.ask.exception.core)
 	implementation(libs.r2dbc.postgresql)
 

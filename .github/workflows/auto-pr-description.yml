@@ -1,0 +1,85 @@
+name: "Auto PR Description"
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  generate-description:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Generate PR Description
+        id: pr_description
+        run: |
+          COMMITS=$(git log ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} --pretty=format:"* %h %s")
+          
+          cat <<EOF > pr_body.txt
+          # Pull Request: ${{ github.event.pull_request.title }}
+          
+          > "La calidad de un sistema empieza por la claridad de sus cambios."
+          
+          ## Descripción Técnica
+          *¿Qué resolvimos y cómo lo hicimos?*
+          
+          * **Contexto:** [¿Por qué este cambio? ¿Qué problema de negocio resuelve?]
+          * **Implementación:** [Explica brevemente la lógica arquitectónica. Menciona los componentes nuevos o modificados].
+          * **Decisiones clave:** [Si tomaste una decisión de diseño, justifícala aquí].
+          
+          ### Historial de Commits
+          $COMMITS
+          
+          ---
+          
+          ## Tipo de Cambio
+          
+          * [ ] **Feature** (Funcionalidad nueva)
+          * [ ] **Bugfix** (Corrección de error)
+          * [ ] **Hotfix** (Parche crítico)
+          * [ ] **Refactor** (Mejora de arquitectura/código)
+          * [ ] **Config** (Infra, CI/CD, dependencias)
+          * [ ] **Docs** (README, Javadoc, OpenApi)
+          
+          ---
+          
+          ## Checklist de Calidad
+          
+          * [ ] **Standards:** Cumple con el Clean Code y patrones de arquitectura definidos.
+          * [ ] **Self-Review:** Revisión línea por línea realizada por el autor.
+          * [ ] **Testing:** Tests unitarios/integración agregados y funcionando.
+          * [ ] **Coverage:** Cobertura de código estable o incrementada.
+          * [ ] **Cleanliness:** Cero warnings, cero código muerto.
+          * [ ] **Validation:** Cambios probados exitosamente en entorno local/dev.
+          
+          ---
+          
+          ## Consideraciones de Despliegue
+          
+          *¿Qué necesita el equipo de Ops o el pipeline para procesar esto?*
+          
+          * [ ] **Env Vars:** ¿Requiere nuevas variables de entorno?
+          * [ ] **DB Migrations:** ¿Requiere scripts SQL o cambios de esquema?
+          * [ ] **Dependencies:** ¿Depende de otro PR o microservicio?
+          
+          ---
+          
+          *Powered by **Ask Architecture***
+          EOF
+
+      - name: Update PR Description
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('pr_body.txt', 'utf8');
+            github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              body: body
+            });

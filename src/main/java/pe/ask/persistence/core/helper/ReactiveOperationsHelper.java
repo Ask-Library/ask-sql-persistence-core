@@ -11,9 +11,10 @@ import org.springframework.core.GenericTypeResolver;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
+import pe.ask.core.mapper.EntityMapper;
+import pe.ask.core.mapper.impl.GenericBeanMapper;
+import pe.ask.core.model.pagination.PageResponse;
 import pe.ask.persistence.core.entity.Entity;
-import pe.ask.persistence.core.mapper.GenericBeanMapper;
-import pe.ask.persistence.core.models.PageResponse;
 import pe.ask.persistence.core.repository.R2DBCHelperRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -48,7 +49,7 @@ public abstract class ReactiveOperationsHelper <
      */
     protected R repository;
 
-    private final GenericBeanMapper<D, E> mapper;
+    private final EntityMapper<D, E> mapper;
 
     private ApplicationContext applicationContext;
 
@@ -79,7 +80,7 @@ public abstract class ReactiveOperationsHelper <
     @SuppressWarnings("unchecked")
     public void afterPropertiesSet() {
         Class<?>[] typeArguments = GenericTypeResolver.resolveTypeArguments(getClass(), ReactiveOperationsHelper.class);
-        Class<R> repositoryClass = (Class<R>) Objects.requireNonNull(typeArguments)[3];
+        Class<R> repositoryClass = (Class<R>) Objects.requireNonNull(typeArguments)[2];
         this.repository = applicationContext.getBean(repositoryClass);
     }
 
@@ -201,37 +202,63 @@ public abstract class ReactiveOperationsHelper <
      * @param direction the sort direction
      * @return a Mono emitting the paginated response
      */
-    public Mono<PageResponse<D>> findPaginated(D domain, int page, int size, String sort, String direction) {
+    public Mono<PageResponse<D>> findPaginated(
+            D domain,
+            int page,
+            int size,
+            String sort,
+            String direction
+    ) {
         Sort.Direction sortDirection = Optional.ofNullable(direction)
                 .filter("asc"::equalsIgnoreCase)
-                .map(d -> Sort.Direction.ASC)
+                .map(value -> Sort.Direction.ASC)
                 .orElse(Sort.Direction.DESC);
 
         String sortProperty = Optional.ofNullable(sort)
-                .filter(s -> !s.trim().isEmpty())
+                .map(String::trim)
+                .filter(value -> !value.isEmpty())
                 .orElse(this.idFieldName);
 
-        org.springframework.data.domain.PageRequest springPageRequest =
-                org.springframework.data.domain.PageRequest.of(page, size, Sort.by(sortDirection, sortProperty));
+        org.springframework.data.domain.PageRequest pageRequest =
+                org.springframework.data.domain.PageRequest.of(
+                        page,
+                        size,
+                        Sort.by(sortDirection, sortProperty)
+                );
 
-        return Mono.fromSupplier(() -> Optional.ofNullable(domain)
-                        .map(this::toEntity)
-                        .orElseGet(() -> this.mapper.toEntity(null))
-                )
-                .map(entity -> Example.of(entity, ExampleMatcher.matching()
-                        .withIgnoreNullValues()
-                        .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
-                        .withIgnoreCase()
+        return Mono.justOrEmpty(domain)
+                .map(this::toEntity)
+                .map(entity -> Example.of(
+                        entity,
+                        ExampleMatcher.matching()
+                                .withIgnoreNullValues()
+                                .withStringMatcher(
+                                        ExampleMatcher.StringMatcher.CONTAINING
+                                )
+                                .withIgnoreCase()
                 ))
-                .flatMap(example -> repository.findBy(example, query -> query.page(springPageRequest)))
-                .map(springPage -> new PageResponse<>(
-                        springPage.getContent().stream().map(this::toDomain).toList(),
-                        springPage.getNumber(),
-                        springPage.getSize(),
-                        springPage.isLast(),
-                        springPage.hasPrevious(),
-                        springPage.hasNext()
-                ));
+                .flatMap(example ->
+                        repository.findBy(
+                                example,
+                                query -> query.page(pageRequest)
+                        )
+                )
+                .map(result -> PageResponse.<D>builder()
+                        .content(
+                                result.getContent()
+                                        .stream()
+                                        .map(this::toDomain)
+                                        .toList()
+                        )
+                        .pageNumber(result.getNumber())
+                        .pageSize(result.getSize())
+                        .totalElements(result.getTotalElements())
+                        .totalPages((long) result.getTotalPages())
+                        .isLast(result.isLast())
+                        .hasPrevious(result.hasPrevious())
+                        .hasNext(result.hasNext())
+                        .build()
+                );
     }
 
     /**
