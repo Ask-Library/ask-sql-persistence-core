@@ -1,0 +1,8 @@
+pe.ask.persistence.core.annotation
+pe.ask.persistence.core.autoconfig
+pe.ask.persistence.core.connection
+pe.ask.persistence.core.entity
+pe.ask.persistence.core.exception
+pe.ask.persistence.core.helper
+pe.ask.persistence.core.properties
+pe.ask.persistence.core.repository
