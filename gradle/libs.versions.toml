@@ -1,5 +1,5 @@
 [versions]
-springBoot = "4.0.6"
+springBoot = "4.1.0"
 ask-core-v = "1.0.4"
 ask-exceptions-core-v = "1.0.3"
 freefair-lombok = "9.5.0"
