@@ -6,3 +6,4 @@ pe.ask.persistence.core.exception
 pe.ask.persistence.core.helper
 pe.ask.persistence.core.properties
 pe.ask.persistence.core.repository
+pe.ask.persistence.core.validation
