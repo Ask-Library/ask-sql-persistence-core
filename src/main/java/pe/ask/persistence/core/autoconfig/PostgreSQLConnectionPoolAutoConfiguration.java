@@ -29,12 +29,22 @@ import pe.ask.persistence.core.properties.PostgresqlConnectionProperties;
 })
 @ConditionalOnProperty(
         prefix = "pe.ask.persistence",
+        name = "enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
+@ConditionalOnProperty(
+        prefix = "pe.ask.persistence",
         name = "db-driver",
         havingValue = "postgresql",
         matchIfMissing = true
 )
-@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE )
-@EnableConfigurationProperties(PostgresqlConnectionProperties.class)
+@ConditionalOnWebApplication(
+        type = ConditionalOnWebApplication.Type.REACTIVE
+)
+@EnableConfigurationProperties(
+        PostgresqlConnectionProperties.class
+)
 @Import(PostgresqlConnectionsRegistry.class)
 public class PostgreSQLConnectionPoolAutoConfiguration {
 }

@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.AutoConfigurationImportFilter=\
+pe.ask.persistence.core.autoconfig.PostgresqlR2dbcAutoConfigurationImportFilter
