@@ -5,34 +5,37 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.time.Duration;
 import java.util.Map;
 
-/**
- * Configuration properties for multiple PostgreSQL database connections.
- *
- * @param dbDriver driver identifier
- * @param primary primary database name
- * @param pool default pool configuration
- * @param databases configured databases
- *
- * @author Allan Sagastegui
- */
 @ConfigurationProperties(prefix = "pe.ask.persistence")
 public record PostgresqlConnectionProperties(
         String dbDriver,
         String primary,
         Pool pool,
+        Validation validation,
         Map<String, Database> databases
 ) {
 
     public PostgresqlConnectionProperties {
-        dbDriver = hasText(dbDriver) ? dbDriver : "postgresql";
-        primary = hasText(primary) ? primary : "primary";
-        pool = pool == null ? new Pool(null, null, null, null) : pool;
-        databases = databases == null ? Map.of() : Map.copyOf(databases);
+        dbDriver = hasText(dbDriver)
+                ? dbDriver
+                : "postgresql";
+
+        primary = hasText(primary)
+                ? primary
+                : "primary";
+
+        pool = pool == null
+                ? new Pool(null, null, null, null)
+                : pool;
+
+        validation = validation == null
+                ? new Validation(null, null)
+                : validation;
+
+        databases = databases == null
+                ? Map.of()
+                : Map.copyOf(databases);
     }
 
-    /**
-     * PostgreSQL database configuration.
-     */
     public record Database(
             Boolean enabled,
             String host,
@@ -49,15 +52,32 @@ public record PostgresqlConnectionProperties(
         }
     }
 
-    /**
-     * R2DBC connection pool configuration.
-     */
     public record Pool(
             Integer initialSize,
             Integer maxSize,
             Duration maxIdleTime,
             String validationQuery
     ) {
+    }
+
+    public record Validation(
+            Boolean enabled,
+            Duration timeout
+    ) {
+
+        public Validation {
+            enabled = enabled == null
+                    ? Boolean.TRUE
+                    : enabled;
+
+            timeout = timeout == null
+                    ? Duration.ofSeconds(10)
+                    : timeout;
+        }
+
+        public boolean isEnabled() {
+            return Boolean.TRUE.equals(enabled);
+        }
     }
 
     private static boolean hasText(String value) {
