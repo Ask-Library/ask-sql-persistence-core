@@ -2,7 +2,7 @@
 springBoot = "4.1.0"
 ask-core-v = "1.0.4"
 ask-exceptions-core-v = "1.0.3"
-freefair-lombok = "9.5.0"
+freefair-lombok = "9.7.0"
 
 [libraries]
 spring-boot-dependencies = { group = "org.springframework.boot", name = "spring-boot-dependencies", version.ref = "springBoot" }
